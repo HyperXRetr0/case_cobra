@@ -1,4 +1,4 @@
-# 📱 Case Cobra
+# 📱 Case Cobra [Ongoing]
 ![screenshot](https://github.com/HyperXRetr0/case_cobra/blob/main/public/readme_main.png)
 
 Welcome to Case Cobra – the ultimate platform for designing and purchasing customized phone case covers! This web application empowers users to create unique and personalized phone cases by adding their custom images, dragging and positioning them anywhere on the canvas, and selecting from multiple premium options.
