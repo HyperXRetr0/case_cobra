@@ -1,6 +1,8 @@
+import { db } from "@/db";
 import { stripe } from "@/lib/stripe";
+import { ShippingAddress } from "@prisma/client";
 import { headers } from "next/headers";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
@@ -27,6 +29,47 @@ export async function POST(req: NextRequest) {
       if (!userId || !orderId) {
         throw new Error("Invalid request metadata");
       }
+      const billingAddress = session.customer_details?.address;
+      const shippingAddress = session.shipping_details?.address;
+      const shippingAddressAppend = db.shippingAddress.create({
+        data: {
+          name: session.customer_details?.name!,
+          city: shippingAddress?.city!,
+          country: shippingAddress?.country!,
+          postalCode: shippingAddress?.postal_code!,
+          street: shippingAddress?.line1!,
+          state: shippingAddress?.state,
+          orderId,
+        },
+      });
+      const billingAddressAppend = db.billingAddress.create({
+        data: {
+          name: session.customer_details?.name!,
+          city: shippingAddress?.city!,
+          country: shippingAddress?.country!,
+          postalCode: shippingAddress?.postal_code!,
+          street: shippingAddress?.line1!,
+          state: shippingAddress?.state,
+          orderId,
+        },
+      });
+      await db.order.update({
+        where: {
+          id: orderId,
+        },
+        data: {
+          isPaid: true,
+          shippingAddressId: (await shippingAddressAppend).id,
+          billingAddressId: (await billingAddressAppend).id,
+        },
+      });
     }
-  } catch (err) {}
+    return NextResponse.json({ result: event, ok: true }, { status: 200 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json(
+      { message: "Something went wrong", ok: false },
+      { status: 500 }
+    );
+  }
 }

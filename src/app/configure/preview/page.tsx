@@ -7,7 +7,7 @@ interface PageProps {
     [key: string]: string | string[] | undefined;
   };
 }
-const page = async ({ searchParams }: PageProps) => {
+const Page = async ({ searchParams }: PageProps) => {
   const { id } = searchParams;
   if (!id || typeof id !== "string") {
     return notFound();
@@ -21,4 +21,4 @@ const page = async ({ searchParams }: PageProps) => {
   return <DesignPreview configuration={configuration} />;
 };
 
-export default page;
+export default Page;
